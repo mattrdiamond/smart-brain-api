@@ -1,9 +1,25 @@
 const express = require("express");
 const bcrypt = require("bcrypt-nodejs");
 const cors = require("cors"); //middleware to fix CORS error and allow us to test on localhost
+const bodyParser = require("body-parser"); // when sending json data from front end, we need to parse it for express to understand --> body-parser
+const knex = require("knex");
 
-// when sending json data from front end, we need to parse it for express to understand --> body-parser
-const bodyParser = require("body-parser");
+const db = knex({
+  client: "pg", //PostgreSQL
+  connection: {
+    host: "127.0.0.1",
+    user: "matt_diamond",
+    password: "",
+    database: "smart-brain"
+  }
+});
+
+db.select("*")
+  .from("users")
+  .then(data => {
+    console.log(data);
+  });
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -59,13 +75,14 @@ app.post("/register", (req, res) => {
   bcrypt.hash(password, null, null, (err, hash) => {
     console.log(hash);
   });
-  database.users.push({
-    id: "125",
-    name: name,
-    email: email,
-    entries: 0, //how many times john has submitted photos for face detection
-    joined: new Date()
-  });
+  // register new user in database (knex)
+  db("users")
+    .insert({
+      email: email,
+      name: name,
+      joined: new Date()
+    })
+    .then(console.log());
   res.json(database.users[database.users.length - 1]); // send newly registered user (last item in database)
 });
 
