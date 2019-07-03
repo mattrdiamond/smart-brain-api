@@ -71,31 +71,36 @@ app.post("/signin", (req, res) => {
 
 app.post("/register", (req, res) => {
   const { email, name, password } = req.body;
-  // encrypt password
-  bcrypt.hash(password, null, null, (err, hash) => {
-    console.log(hash);
-  });
   // register new user in database (knex)
-  db("users")
+  return db("users")
+    .returning("*") // users -> insert user and return all columns (knex)
     .insert({
       email: email,
       name: name,
       joined: new Date()
     })
-    .then(console.log());
-  res.json(database.users[database.users.length - 1]); // send newly registered user (last item in database)
+    .then(user => {
+      res.json(user[0]);
+    })
+    .catch(err => res.status(400).json("unable to join"));
 });
 
 app.get("/profile/:id", (req, res) => {
   const { id } = req.params;
-  let found = false;
-  database.users.forEach(user => {
-    if (user.id === id) {
-      found = true;
-      return res.json(user);
-    }
-  });
-  if (!found) res.status(400).json("not found");
+  db.select("*")
+    .from("users")
+    .where({
+      id: id
+    })
+    .then(user => {
+      // if user exists
+      if (user.length) {
+        res.json(user[0]); // respond with user
+      } else {
+        res.status(400).json("Not found");
+      }
+    })
+    .catch(err => res.status(400).json("error getting user"));
 });
 
 app.put("/image", (req, res) => {
