@@ -31,7 +31,7 @@ const handleRegister = (req, res, database, bcrypt) => {
         .then(trx.commit) // if both transactions pass, then commit
         .catch(trx.rollback); // any failure - database will rollback to prev state
     })
-    .catch(err => res.status(400).json("unable to join"));
+    .catch(err => res.status(400).json("unable to register"));
 };
 
 module.exports = {
