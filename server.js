@@ -8,15 +8,6 @@ const signin = require("./controllers/signin");
 const profile = require("./controllers/profile");
 const image = require("./controllers/image");
 
-// const database = knex({
-//   client: "pg", //PostgreSQL
-//   connection: {
-//     host: "127.0.0.1", //localhost
-//     user: "matt_diamond",
-//     password: "",
-//     database: "smart-brain"
-//   }
-// });
 const database = knex({
   client: "pg", //PostgreSQL
   connection: {
